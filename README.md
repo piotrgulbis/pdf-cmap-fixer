@@ -27,6 +27,9 @@ Or with pip:
 pip install -e .
 ```
 
+After install, the four scripts are also reachable as console commands:
+`pdf-cmap-inspect`, `pdf-cmap-extract`, `pdf-cmap-render-pua`, `pdf-cmap-fix`.
+
 ## Workflow
 
 ### 1. Diagnose
@@ -54,6 +57,8 @@ uv run fix_pdf_fonts.py input.pdf -o input_fixed.pdf
 ```
 
 Builds a corrected `ToUnicode` CMap for each font from its glyph names and writes a new PDF. Reports `mapped X/Y glyphs` per font. This usually recovers most of the broken text immediately.
+
+Use `--dry-run` to print the per-font summary without writing anything — useful for previewing a `--mapping` file before committing to it.
 
 If `inspect_fonts.py` on `input_fixed.pdf` reports zero broken spans, you're done.
 
