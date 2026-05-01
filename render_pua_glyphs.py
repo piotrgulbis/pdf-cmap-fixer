@@ -6,25 +6,13 @@ import pikepdf
 from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont
 
+from _pdf_utils import font_program_stream
+
 
 CELL = 96
 LABEL_H = 22
 COLS = 8
 PAD = 4
-
-
-def font_program_stream(font_obj: pikepdf.Object) -> pikepdf.Object | None:
-    descriptor = font_obj.get("/FontDescriptor")
-    if descriptor is None and font_obj.get("/Subtype") == "/Type0":
-        descendants = font_obj.get("/DescendantFonts")
-        if descendants:
-            descriptor = descendants[0].get("/FontDescriptor")
-    if descriptor is None:
-        return None
-    for key in ("/FontFile2", "/FontFile3", "/FontFile"):
-        if key in descriptor:
-            return descriptor[key]
-    return None
 
 
 def is_pua_name(name: str) -> bool:
@@ -117,7 +105,7 @@ def main() -> None:
             seen.add(obj_id)
 
             name = str(obj.get("/BaseFont") or obj.get("/FontName") or "<unnamed>").lstrip("/")
-            stream = font_program_stream(obj)
+            stream, _ = font_program_stream(obj)
             if stream is None:
                 continue
             ttf_bytes = stream.read_bytes()
