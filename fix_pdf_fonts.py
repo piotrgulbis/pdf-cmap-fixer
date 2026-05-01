@@ -159,6 +159,8 @@ def main() -> None:
                 continue
 
             if not args.dry_run:
+                # CMap syntax is pure ASCII (PDF spec §10.8); encode as ascii to
+                # catch any accidental non-ASCII content early rather than silently.
                 new_stream = pdf.make_stream(cmap_content.encode("ascii"))
                 obj["/ToUnicode"] = new_stream
             extra = f" (+{manual_used} manual)" if manual_used else ""
