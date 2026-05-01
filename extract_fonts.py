@@ -41,8 +41,7 @@ def inspect_font(name: str, obj_id: int, stream: pikepdf.Object, kind: str, dump
 
     print(f"  saved {out_path.name} ({len(raw)} bytes)")
     print(
-        f"    glyphs: {total}, named: {named} ({named/total:.0%}), "
-        f"post: {has_post}, cmap: {has_cmap}, CFF: {has_cff}"
+        f"    glyphs: {total}, named: {named} ({named / total:.0%}), post: {has_post}, cmap: {has_cmap}, CFF: {has_cff}"
     )
     if sample:
         print(f"    sample names: {sample}")

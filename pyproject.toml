@@ -31,3 +31,14 @@ py-modules = [
     "inspect_fonts",
     "render_pua_glyphs",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

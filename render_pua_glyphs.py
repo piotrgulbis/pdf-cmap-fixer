@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 from _pdf_utils import font_program_stream
 
-
 CELL = 96
 LABEL_H = 22
 COLS = 8
