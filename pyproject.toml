@@ -10,3 +10,22 @@ dependencies = [
     "pillow>=10.4.0",
     "pymupdf>=1.27.2",
 ]
+
+[project.scripts]
+pdf-cmap-inspect = "inspect_fonts:main"
+pdf-cmap-extract = "extract_fonts:main"
+pdf-cmap-render-pua = "render_pua_glyphs:main"
+pdf-cmap-fix = "fix_pdf_fonts:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = [
+    "_pdf_utils",
+    "extract_fonts",
+    "fix_pdf_fonts",
+    "inspect_fonts",
+    "render_pua_glyphs",
+]
