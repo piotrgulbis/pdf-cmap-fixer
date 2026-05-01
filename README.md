@@ -59,7 +59,7 @@ If `inspect_fonts.py` on `input_fixed.pdf` reports zero broken spans, you're don
 
 ### 3. Manual identification (when needed)
 
-If broken text remains, it's usually small caps or stylistic variants stored as Private Use Area glyphs. Generate identification grids:
+If broken text remains, it's usually small caps or stylistic variants stored as Private Use Area glyphs. The fix always reads from the **original** PDF (the embedded fonts are the same in the original and the auto-fixed copy, and the fix builds CMaps from scratch — fixes don't get layered on top of each other). Generate identification grids from the original:
 
 ```
 uv run render_pua_glyphs.py input.pdf
@@ -81,6 +81,8 @@ ABCDEF+SomeFont 0x0004 = r
 For symbol fonts (Wingdings etc.) you can map to any Unicode character you'd like, e.g. `= ◆`.
 
 ### 4. Re-fix with the manual mapping
+
+Run the fix again on the original PDF — the manual mapping is merged in alongside the auto-derived entries in a single pass:
 
 ```
 uv run fix_pdf_fonts.py input.pdf -o input_fixed.pdf --mapping pua_mapping.txt
