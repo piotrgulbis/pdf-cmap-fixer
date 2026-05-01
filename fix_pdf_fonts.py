@@ -149,7 +149,7 @@ def main() -> None:
                 print(f"  {name}: no mappable glyph names — left untouched")
                 continue
 
-            new_stream = pdf.make_stream(cmap_content.encode("latin-1"))
+            new_stream = pdf.make_stream(cmap_content.encode("ascii"))
             obj["/ToUnicode"] = new_stream
             extra = f" (+{manual_used} manual)" if manual_used else ""
             print(f"  {name}: mapped {mapped}/{len(glyph_names)} glyphs{extra}")
