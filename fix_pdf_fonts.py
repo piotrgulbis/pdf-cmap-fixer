@@ -102,12 +102,19 @@ def build_cmap(glyph_names: list[str], overrides: dict[int, str] | None = None) 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inject corrected ToUnicode CMaps from glyph names.")
     parser.add_argument("pdf", type=Path)
-    parser.add_argument("-o", "--output", type=Path, required=True)
+    parser.add_argument("-o", "--output", type=Path, help="Output PDF path. Required unless --dry-run.")
     parser.add_argument("--mapping", type=Path, default=None, help="Manual PUA-glyph mapping file.")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the per-font summary without writing an output PDF.",
+    )
     args = parser.parse_args()
 
     if not args.pdf.is_file():
         parser.error(f"PDF not found: {args.pdf}")
+    if not args.dry_run and args.output is None:
+        parser.error("-o/--output is required unless --dry-run is set")
 
     manual: dict[str, dict[int, str]] = {}
     if args.mapping and args.mapping.is_file():
@@ -149,13 +156,17 @@ def main() -> None:
                 print(f"  {name}: no mappable glyph names — left untouched")
                 continue
 
-            new_stream = pdf.make_stream(cmap_content.encode("ascii"))
-            obj["/ToUnicode"] = new_stream
+            if not args.dry_run:
+                new_stream = pdf.make_stream(cmap_content.encode("ascii"))
+                obj["/ToUnicode"] = new_stream
             extra = f" (+{manual_used} manual)" if manual_used else ""
             print(f"  {name}: mapped {mapped}/{len(glyph_names)} glyphs{extra}")
 
-        pdf.save(args.output)
-    print(f"\nWrote {args.output}")
+        if args.dry_run:
+            print("\nDry run — no output written.")
+        else:
+            pdf.save(args.output)
+            print(f"\nWrote {args.output}")
 
 
 if __name__ == "__main__":
