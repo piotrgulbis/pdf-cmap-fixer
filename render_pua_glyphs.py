@@ -15,28 +15,45 @@ COLS = 8
 PAD = 4
 
 
+def pua_codepoints(name: str) -> list[int] | None:
+    """Codepoints encoded in an Adobe-style glyph name, if all are in the PUA.
+
+    Recognizes uXXXX, uniXXXX, and multi-codepoint uniXXXXYYYY... ligatures.
+    Returns None if the name isn't one of those forms or any codepoint falls
+    outside the BMP PUA range.
+    """
+    if name.startswith("uni") and len(name) > 3 and (len(name) - 3) % 4 == 0:
+        try:
+            cps = [int(name[i : i + 4], 16) for i in range(3, len(name), 4)]
+        except ValueError:
+            return None
+    elif name.startswith("u") and 5 <= len(name) <= 7:
+        try:
+            cps = [int(name[1:], 16)]
+        except ValueError:
+            return None
+    else:
+        return None
+    if not all(0xE000 <= cp <= 0xF8FF for cp in cps):
+        return None
+    return cps
+
+
 def is_pua_name(name: str) -> bool:
-    if not name.startswith("uni") or len(name) != 7:
-        return False
-    try:
-        cp = int(name[3:], 16)
-    except ValueError:
-        return False
-    return 0xE000 <= cp <= 0xF8FF
+    return pua_codepoints(name) is not None
 
 
-def render_glyph(ttf_bytes: bytes, codepoint: int, size: int = 64) -> Image.Image:
+def render_glyph(ttf_bytes: bytes, text: str, size: int = 64) -> Image.Image:
     cell = Image.new("RGB", (CELL, CELL), "white")
     draw = ImageDraw.Draw(cell)
     try:
         pil_font = ImageFont.truetype(io.BytesIO(ttf_bytes), size=size)
-        ch = chr(codepoint)
-        bbox = draw.textbbox((0, 0), ch, font=pil_font)
+        bbox = draw.textbbox((0, 0), text, font=pil_font)
         w = bbox[2] - bbox[0]
         h = bbox[3] - bbox[1]
         x = (CELL - w) // 2 - bbox[0]
         y = (CELL - h) // 2 - bbox[1]
-        draw.text((x, y), ch, font=pil_font, fill="black")
+        draw.text((x, y), text, font=pil_font, fill="black")
     except Exception as exc:
         draw.text((4, 4), f"err\n{exc.__class__.__name__}", fill="red")
     return cell
@@ -59,10 +76,10 @@ def make_grid(font_name: str, items: list[tuple[int, str]], ttf_bytes: bytes) ->
         row = i // COLS
         x = PAD + col * (CELL + PAD)
         y = 30 + row * (CELL + LABEL_H + PAD)
-        try:
-            cp = int(name[3:], 16)
-            cell = render_glyph(ttf_bytes, cp)
-        except Exception:
+        cps = pua_codepoints(name)
+        if cps:
+            cell = render_glyph(ttf_bytes, "".join(chr(cp) for cp in cps))
+        else:
             cell = Image.new("RGB", (CELL, CELL), "lightgray")
         img.paste(cell, (x, y))
         label = f"GID {gid:#06x}"
