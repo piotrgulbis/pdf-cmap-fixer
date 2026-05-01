@@ -3,6 +3,8 @@ name = "pdf-cmap-fixer"
 version = "0.1.0"
 description = "Repair broken ToUnicode CMaps in PDFs so extracted text matches the visual content."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
     "fonttools>=4.62.1",
