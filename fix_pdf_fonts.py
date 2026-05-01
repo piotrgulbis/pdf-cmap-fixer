@@ -7,6 +7,8 @@ import pikepdf
 from fontTools import agl
 from fontTools.ttLib import TTFont
 
+from _pdf_utils import font_program_stream
+
 
 def name_to_unicode(name: str) -> str | None:
     if not name or name in {".notdef", ".null"} or name.startswith("glyph"):
@@ -95,20 +97,6 @@ def build_cmap(glyph_names: list[str], overrides: dict[int, str] | None = None) 
     return "\n".join(lines), len(entries), override_count
 
 
-def font_program_stream(font_obj: pikepdf.Object) -> pikepdf.Object | None:
-    descriptor = font_obj.get("/FontDescriptor")
-    if descriptor is None and font_obj.get("/Subtype") == "/Type0":
-        descendants = font_obj.get("/DescendantFonts")
-        if descendants:
-            descriptor = descendants[0].get("/FontDescriptor")
-    if descriptor is None:
-        return None
-    for key in ("/FontFile2", "/FontFile3", "/FontFile"):
-        if key in descriptor:
-            return descriptor[key]
-    return None
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Inject corrected ToUnicode CMaps from glyph names.")
     parser.add_argument("pdf", type=Path)
@@ -141,7 +129,7 @@ def main() -> None:
             seen.add(obj_id)
 
             name = str(obj.get("/BaseFont") or obj.get("/FontName") or "<unnamed>").lstrip("/")
-            stream = font_program_stream(obj)
+            stream, _ = font_program_stream(obj)
             if stream is None:
                 print(f"  {name}: skipped (no embedded program)")
                 continue

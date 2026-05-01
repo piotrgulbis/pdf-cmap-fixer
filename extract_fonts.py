@@ -5,21 +5,7 @@ from pathlib import Path
 import pikepdf
 from fontTools.ttLib import TTFont
 
-
-def font_program_stream(font_obj: pikepdf.Object) -> tuple[pikepdf.Object | None, str]:
-    descriptor = font_obj.get("/FontDescriptor")
-    if descriptor is None and font_obj.get("/Subtype") == "/Type0":
-        descendants = font_obj.get("/DescendantFonts")
-        if descendants:
-            descriptor = descendants[0].get("/FontDescriptor")
-
-    if descriptor is None:
-        return None, "no /FontDescriptor"
-
-    for key, kind in (("/FontFile2", "TrueType"), ("/FontFile3", "CFF/OpenType"), ("/FontFile", "Type1")):
-        if key in descriptor:
-            return descriptor[key], kind
-    return None, "no embedded font program"
+from _pdf_utils import font_program_stream
 
 
 def font_name(font_obj: pikepdf.Object) -> str:
@@ -85,7 +71,7 @@ def main() -> None:
             seen.add(name)
 
             stream, kind = font_program_stream(obj)
-            print(f"\n{name}  [{kind}]")
+            print(f"\n{name}  [{kind or 'no embedded program'}]")
             if stream is None:
                 continue
             inspect_font(name, stream, kind, args.out)
