@@ -15,6 +15,9 @@ COLS = 8
 PAD = 4
 
 
+UNI_PREFIX_LEN = 3  # length of the "uni" prefix in uniXXXX glyph names
+
+
 def pua_codepoints(name: str) -> list[int] | None:
     """Codepoints encoded in an Adobe-style glyph name, if all are in the PUA.
 
@@ -22,9 +25,9 @@ def pua_codepoints(name: str) -> list[int] | None:
     Returns None if the name isn't one of those forms or any codepoint falls
     outside the BMP PUA range.
     """
-    if name.startswith("uni") and len(name) > 3 and (len(name) - 3) % 4 == 0:
+    if name.startswith("uni") and len(name) > UNI_PREFIX_LEN and (len(name) - UNI_PREFIX_LEN) % 4 == 0:
         try:
-            cps = [int(name[i : i + 4], 16) for i in range(3, len(name), 4)]
+            cps = [int(name[i : i + 4], 16) for i in range(UNI_PREFIX_LEN, len(name), 4)]
         except ValueError:
             return None
     elif name.startswith("u") and 5 <= len(name) <= 7:
