@@ -57,15 +57,17 @@ def build_cmap(glyph_names: list[str], overrides: dict[int, str] | None = None) 
     entries: list[tuple[str, str]] = []
     override_count = 0
     for gid, name in enumerate(glyph_names):
-        if gid in overrides:
+        is_override = gid in overrides
+        if is_override:
             u = overrides[gid]
-            override_count += 1
         else:
             u = name_to_unicode(name)
             if not u or is_all_pua(u):
                 continue
         if not u:
             continue
+        if is_override:
+            override_count += 1
         cid_hex = f"{gid:04X}"
         unicode_hex = "".join(f"{ord(c):04X}" for c in u)
         entries.append((cid_hex, unicode_hex))
