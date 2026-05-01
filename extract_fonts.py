@@ -58,23 +58,24 @@ def main() -> None:
         parser.error(f"PDF not found: {args.pdf}")
     args.out.mkdir(parents=True, exist_ok=True)
 
-    seen: set[str] = set()
+    seen: set[int] = set()
     with pikepdf.open(args.pdf) as pdf:
         for obj in pdf.objects:
             if not isinstance(obj, pikepdf.Dictionary):
                 continue
             if obj.get("/Type") != "/Font":
                 continue
-            name = font_name(obj)
-            if name in seen:
+            obj_id = obj.objgen[0]
+            if obj_id in seen:
                 continue
-            seen.add(name)
+            seen.add(obj_id)
 
+            name = font_name(obj)
             stream, kind = font_program_stream(obj)
             print(f"\n{name}  [{kind or 'no embedded program'}]")
             if stream is None:
                 continue
-            inspect_font(name, stream, kind, args.out)
+            inspect_font(name, obj_id, stream, kind, args.out)
 
 
 if __name__ == "__main__":
