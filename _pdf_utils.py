@@ -1,6 +1,5 @@
 import pikepdf
 
-
 FONT_PROGRAM_KEYS: tuple[tuple[str, str], ...] = (
     ("/FontFile2", "TrueType"),
     ("/FontFile3", "CFF/OpenType"),
