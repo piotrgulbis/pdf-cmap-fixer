@@ -130,6 +130,8 @@ def main() -> None:
             if obj.get("/Type") != "/Font":
                 continue
             subtype = obj.get("/Subtype")
+            # Skip CIDFont descendants: ToUnicode lives on the Type0 wrapper that
+            # references them, and we'll process that wrapper on its own iteration.
             if subtype in ("/CIDFontType0", "/CIDFontType2"):
                 continue
             obj_id = obj.objgen[0]
