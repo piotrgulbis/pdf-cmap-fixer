@@ -13,10 +13,10 @@ def font_name(font_obj: pikepdf.Object) -> str:
     return str(name).lstrip("/")
 
 
-def inspect_font(name: str, stream: pikepdf.Object, kind: str, dump_dir: Path) -> None:
+def inspect_font(name: str, obj_id: int, stream: pikepdf.Object, kind: str, dump_dir: Path) -> None:
     raw = stream.read_bytes()
     suffix = {"TrueType": "ttf", "CFF/OpenType": "otf", "Type1": "pfb"}.get(kind, "bin")
-    out_path = dump_dir / f"{name}.{suffix}"
+    out_path = dump_dir / f"{name}-obj{obj_id}.{suffix}"
     out_path.write_bytes(raw)
 
     if kind == "Type1":
