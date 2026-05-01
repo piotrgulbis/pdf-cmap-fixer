@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Tool outputs
+fonts/
+pua_glyphs/
+pua_mapping.txt
+
+# PDFs
+*.pdf

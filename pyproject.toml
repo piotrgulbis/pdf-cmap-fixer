@@ -1,0 +1,12 @@
+[project]
+name = "pdf-cmap-fixer"
+version = "0.1.0"
+description = "Repair broken ToUnicode CMaps in PDFs so extracted text matches the visual content."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fonttools>=4.62.1",
+    "pikepdf>=10.5.1",
+    "pillow>=10.4.0",
+    "pymupdf>=1.27.2",
+]
