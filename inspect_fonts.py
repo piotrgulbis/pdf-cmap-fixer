@@ -23,24 +23,24 @@ def span_is_broken(text: str) -> bool:
 
 
 def inspect(pdf_path: Path, examples_per_font: int) -> None:
-    doc = pymupdf.open(pdf_path)
     broken_counts: dict[str, int] = defaultdict(int)
     total_counts: dict[str, int] = defaultdict(int)
     examples: dict[str, list[tuple[int, str]]] = defaultdict(list)
 
-    for page in doc:
-        for block in page.get_text("dict")["blocks"]:
-            for line in block.get("lines", []):
-                for span in line.get("spans", []):
-                    font = span.get("font", "<unknown>")
-                    text = span.get("text", "")
-                    if not text.strip():
-                        continue
-                    total_counts[font] += 1
-                    if span_is_broken(text):
-                        broken_counts[font] += 1
-                        if len(examples[font]) < examples_per_font:
-                            examples[font].append((page.number, text))
+    with pymupdf.open(pdf_path) as doc:
+        for page in doc:
+            for block in page.get_text("dict")["blocks"]:
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+                        font = span.get("font", "<unknown>")
+                        text = span.get("text", "")
+                        if not text.strip():
+                            continue
+                        total_counts[font] += 1
+                        if span_is_broken(text):
+                            broken_counts[font] += 1
+                            if len(examples[font]) < examples_per_font:
+                                examples[font].append((page.number, text))
 
     print(f"{'Font':<45} {'Broken':>8} {'Total':>8} {'Ratio':>8}")
     print("-" * 71)
